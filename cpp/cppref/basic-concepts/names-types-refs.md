@@ -46,7 +46,7 @@ Again a lookup is ran on the name `cout` which finds a variable in the namespace
 
 Program defined types
 - program defined types include non closure class types, enumeration types, lambda expressions
-****
+
 Type naming
 - types can be named using a class, enum, typpedef or type alias
 - For types with no name type id syntax is used
@@ -144,6 +144,13 @@ int f(T&& x)                      // x is a forwarding reference
 }
 ```
 forward refs are used a lot in generic programming like templates to ensure something like an rvalue ref isnt lost
+
+## Values
+glvalue: is an expression whos evaluation determines the identity of an object or function
+prvalue: expression whose evaluation
+    - compoutes the val of an operand of a built in operator
+    - initializes an object
+xvalue is a glvalue that denotes an object whose resources can be reused
 ## Templates
 templates allow generic code to work with different data types. They allow function or classes to work with different types. 
 
