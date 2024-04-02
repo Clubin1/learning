@@ -92,3 +92,10 @@ int main()
     return 0;
 }
 ```
+
+**Variadic template refactoring**
+The existing code in the codebase here had multiple different templates to handle all of the different types and testing functions. Variadic templates are used here toa void having duplicate templating code. 
+
+key notes
+- Variadic templates can be recursive by nature. When working with overloaded functions the instructor opted to simply code out the first case so the compiler doesn't have to guess which overloaded function to call.
+- In the video a `std::initializer_list<>` is used with pack expansion to preform an action and handle all types in order. It can be used in other cases to avoid recursive intialization of templating functions. Some compilers might complain about the return type, `void()<std::initializer_list>` can be used.
