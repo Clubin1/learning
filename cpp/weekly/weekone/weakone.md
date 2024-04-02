@@ -94,6 +94,7 @@ int main()
 ```
 
 **Variadic template refactoring**
+
 The existing code in the codebase here had multiple different templates to handle all of the different types and testing functions. Variadic templates are used here toa void having duplicate templating code. 
 
 key notes
