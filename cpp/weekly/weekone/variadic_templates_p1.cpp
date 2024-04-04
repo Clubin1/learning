@@ -21,5 +21,6 @@ int main()
     for(const auto &o : vec) {
         std::cout << o << '\n';
     }
+    
     return 0;
 }

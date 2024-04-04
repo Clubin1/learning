@@ -22,7 +22,7 @@ Ep 11 part 2 15M
 
 ## Variadic Templates 
 **part one**
-```
+```c++
 #include <iostream> 
 #include <sstream>
 #include <vector>
@@ -55,7 +55,7 @@ Variadic templates are defined by using an elipsis in the function signature and
 
 The same code can be done recursively by creating a base case and modifying the function to appending to the list recursively. A recursive approach does increase overhead. 
 
-```
+```c++
 #include <iostream> 
 #include <sstream>
 #include <vector>
@@ -100,3 +100,8 @@ The existing code in the codebase here had multiple different templates to handl
 key notes
 - Variadic templates can be recursive by nature. When working with overloaded functions the instructor opted to simply code out the first case so the compiler doesn't have to guess which overloaded function to call.
 - In the video a `std::initializer_list<>` is used with pack expansion to preform an action and handle all types in order. It can be used in other cases to avoid recursive intialization of templating functions. Some compilers might complain about the return type, `void()<std::initializer_list>` can be used.
+
+**Variadic template review**
+
+key notes
+- different compilers evaluate the order of functionc alls differently. This is wht its important to do `void()<std::initializer_list><int>`. Braces are also needed. For example `void()<std::initializer_list><int>{recursive_template(t), 0)...};`
