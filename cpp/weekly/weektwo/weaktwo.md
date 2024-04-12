@@ -23,4 +23,52 @@ Ep 26 Language Features Removed in C++17 10M
 Ep 27 Sequence Containers 10M
 Ep 28 C++17 [[fallthrough]] Attribute 5M
 Ep 29 C++17 [[maybe_unused]] Attribute 5M 
-Ep 30 [[nodiscard attribute]] 5M
+Ep 30 [[nodiscard attribute]] 5MEp 12 C++17 std::any 20M
+
+
+## std::any
+an object that holds any type
+
+if an object is no throw move constructible and is 16 bytes or less, the std::any object does not have to pay dynamic allocation costs. 
+
+This is good to avoid since dynamic allocation involves overhead by requesting memory from the heap and other book keeping costs. 
+```c++
+#include <expiremental/any>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <type_traits>
+struct T {
+    S(const S &s) = default;
+    s() = default;
+}
+
+int main() {
+    std::vector<std::expiremental::fundamentals_v1::any> v{5,3.4, std::string("Hello World"), s()};
+
+    static assert(std::is_nothrow_move_constructible<S>::value, "no throew");
+}
+```
+an example of ensuring that something is no throw move constructible and std any
+```c++
+#include <any>
+#include <iostream>
+#include <string>
+
+int main() {
+    std::any value = std::string("Hello, world!");
+
+    try {
+        std::string& str = std::any_cast<std::string&>(value);
+        std::cout << str << std::endl;  // Output: Hello, world!
+
+        int& num = std::any_cast<int&>(value);  // Throws std::bad_any_cast
+    } catch (const std::bad_any_cast& e) {
+        std::cout << "Bad any_cast: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+```
+std any and anycast.
+anycast must be used if reading a std::any value. The type has to be known
