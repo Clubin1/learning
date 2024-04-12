@@ -27,7 +27,7 @@ Ep 30 [[nodiscard attribute]] 5MEp 12 C++17 std::any 20M
 
 
 ## std::any
-an object that holds any type
+an object that holds any type in c++17
 
 if an object is no throw move constructible and is 16 bytes or less, the std::any object does not have to pay dynamic allocation costs. 
 
@@ -72,3 +72,60 @@ int main() {
 ```
 std any and anycast.
 anycast must be used if reading a std::any value. The type has to be known
+
+## std::next std::exchange
+std::next takes iterator and increments it forward the most optimal way possible. Works for both lists and vectors.
+
+if using something like
+
+```C++
+if(std::is_sorted(std::begin(v), std::end(v));
+```
+
+however we want to exclude n items
+
+```C++
+if(std::is_sorted(std::begin(v) + n, std::end(v));
+```
+works if v is a vector however not if v is a list.
+```C++
+if(std::is_sorted(std::next(std::begin(v)), std::end(v));
+```
+can be used as a way to increment the iterator without making an assumption the iterator can support integer operations
+
+**std::exchange**
+replaces the old value with a new value and the new value with the old value. It avoids copying of data.
+```c++
+    int main() {
+        for (int i = 0; i < 1000; i++) {
+            last = std::exchange(i, new_value);
+        }
+    }
+```
+```c++
+#include <iostream>
+#include <vector>
+#include <utility>
+
+void cyclicSort(std::vector<int>& nums) {
+    int n = nums.size();
+    for (int i = 0; i < n; ++i) {
+        int j = i;
+        while (nums[j] != i + 1) {
+            int correctPos = nums[j] - 1;
+            std::exchange(nums[j], nums[correctPos]);
+        }
+    }
+}
+
+int main() {
+    std::vector<int> nums = {3, 1, 5, 4, 2};
+    cyclicSort(nums);
+    for (int num : nums) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+    return 0;
+}
+```
+example of std::exchange in a cyclic sort algorithim
