@@ -106,44 +106,6 @@ key notes
 key notes
 - different compilers evaluate the order of functionc alls differently. This is wht its important to do `void()<std::initializer_list><int>`. Braces are also needed. For example `void()<std::initializer_list><int>{recursive_template(t), 0)...};`
 
-
-## Std Future
-```c++
-#include <random>
-#include <set>
-#include <iostream>
-#include <algorithm>
-#include <future>
-
-std::set<int> make_sorted_random(const size_t num_elems) {
-    std::set<int> retval;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, num_elems - 1);
-    std::generate_n(std::inserter(retval, retval.end()), num_elems, [&](){ return dis(gen); });
-    return retval;
-}
-
-int main() {
-    auto f1 = std::async(std::launch::async, make_sorted_random, 100000);
-    auto f2 = std::async(std::launch::async, make_sorted_random, 100000);
-
-    std::cout << f1.get().size() << ' ' << f2.get().size() << '\n';
-}
-```
-used to preform things in parallelism. `std::async` takes a function and its parameters and runs it asyncronously. `std::async` also can take in `std::launch::async` which is a launch policy that gurantees the function will run async on another thread.
-
-`std::async` returns a callable object of `std::future`
-
-`std::future.get()` is a blocking call so in order to ensure async add async policy.
-
-`std::launch:deferred` is another launch policy that uses lazy evaluation.
-
-## std::endl vs '\n'
-main takeaways
-- std::endl preforms a flush after every call. If you don't need a flush use \n as it improves performance. 
-- If a flush was needed a manual flush at the end is also a possible approach.
-
 ## cost of using statics
 ```c++
 struct C {
@@ -188,3 +150,40 @@ The magic_static_ref() function returns a reference to the member variable s, no
 In the first main() function, the compiler has to make a call to the size() function every time magic_static() is called. There is a thread-safe comparison (cmpb with a guard variable) to check if the static variable has been initialized, which happens for each function call.
 
 In the second main() function, the compiler eliminates all calls to magic_static_ref().size() because it knows there are no side effects to those calls. The cached reference to the variable s is used, avoiding the overhead of accessing the static variable created by magic_static().
+
+## Std Future
+```c++
+#include <random>
+#include <set>
+#include <iostream>
+#include <algorithm>
+#include <future>
+
+std::set<int> make_sorted_random(const size_t num_elems) {
+    std::set<int> retval;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, num_elems - 1);
+    std::generate_n(std::inserter(retval, retval.end()), num_elems, [&](){ return dis(gen); });
+    return retval;
+}
+
+int main() {
+    auto f1 = std::async(std::launch::async, make_sorted_random, 100000);
+    auto f2 = std::async(std::launch::async, make_sorted_random, 100000);
+
+    std::cout << f1.get().size() << ' ' << f2.get().size() << '\n';
+}
+```
+used to preform things in parallelism. `std::async` takes a function and its parameters and runs it asyncronously. `std::async` also can take in `std::launch::async` which is a launch policy that gurantees the function will run async on another thread.
+
+`std::async` returns a callable object of `std::future`
+
+`std::future.get()` is a blocking call so in order to ensure async add async policy.
+
+`std::launch:deferred` is another launch policy that uses lazy evaluation.
+
+## std::endl vs '\n'
+main takeaways
+- std::endl preforms a flush after every call. If you don't need a flush use \n as it improves performance. 
+- If a flush was needed a manual flush at the end is also a possible approach.
