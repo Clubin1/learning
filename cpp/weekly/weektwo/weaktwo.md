@@ -129,3 +129,19 @@ int main() {
 }
 ```
 example of std::exchange in a cyclic sort algorithim
+
+## std::bind 
+can bind parameters from anything callable into said object. If we have a function that prints 2 values we can craete a bind object of the print function with example parameters.
+```c++
+auto f = std::bind(&print, arg1, arg2);
+f();
+f();
+```
+std::bind is not optimal to use as it has a lot of overhead and the same tasks can be completed using lambdas
+```c++
+const auto f = [](auto &&arg1, auto &&arg2) {
+    print(arg1, arg2);
+};
+f("s", 2);
+```
+there is a heavy performance difference using std::bind over lambdas.
