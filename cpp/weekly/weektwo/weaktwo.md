@@ -145,3 +145,47 @@ const auto f = [](auto &&arg1, auto &&arg2) {
 f("s", 2);
 ```
 there is a heavy performance difference using std::bind over lambdas.
+
+## std::invoke()
+a universal interface to access callable objects and invoke them
+```c++
+#include <iostream>
+#include <functional>
+
+void printValue(int value) {
+    std::cout << "Value: " << value << std::endl;
+}
+
+struct Functor {
+    void operator()(const std::string& str) {
+        std::cout << "String: " << str << std::endl;
+    }
+};
+
+int main() {
+    // Invoking a free function
+    std::invoke(printValue, 42);
+
+    // Invoking a lambda function
+    auto lambda = [](double d) {
+        std::cout << "Double: " << d << std::endl;
+    };
+    std::invoke(lambda, 3.14);
+
+    // Invoking a function object (functor)
+    Functor functor;
+    std::invoke(functor, "Hello, world!");
+
+    // Invoking a member function
+    std::string str = "Hello";
+    std::invoke(&std::string::size, str);
+
+    // Invoking a member object pointer
+    int x = 10;
+    int* ptr = &x;
+    std::invoke(ptr);
+
+    return 0;
+}
+```
+use cases are for writting generic code where we can avoid having to write specific function calls for different types and abstracts it away. 
