@@ -189,3 +189,40 @@ int main() {
 }
 ```
 use cases are for writting generic code where we can avoid having to write specific function calls for different types and abstracts it away. 
+
+## constexpr if 
+essentially a way to preform compile-time branching. A common use case is for checking things like typing at compile time
+
+```c++
+#include <type_traits>
+#include <limits>
+#include <iostream>
+
+template<typename T>
+constexpr bool is_both() {
+    if constexpr(std::is_integral<T>::value && !std::is_same<bool, T>::value) {
+        if constexpr(std::numeric_limits<T>::max() < 1000) {
+            return true
+        }
+    }
+    return false;
+}
+template<typename T>
+auto print_type_info(const T&t) {
+    if constexpr(is_both<T>()) {
+        return t + 1;
+    } else if constexpr(std::is_floating_point<T>::value) {
+        return t + 0.1;
+    } else {
+        return t;
+    }
+}
+int main () {
+    print_type_info(1);
+    print_type_info(100000);
+}
+```
+with constexpr if the main thing to remember is how branches are removed out from the compiler. Some behavior and assumptions are made at compile time that require extra handling then if it wasnt at compile time. 
+
+In this example, to add 1 to T T has to be a integral, be the same as bool and also be < 1000. The nested if branch is needed so the compiler knows that if it passes the first branch it has access to `std::numeric_limits`. 
+
