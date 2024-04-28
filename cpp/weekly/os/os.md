@@ -353,3 +353,93 @@ response = firstrun - arrival
 works by time slicing at a defined unit of time and context switching to other tasks over and over until they are all done. Has the best response time however has bad turnaround time
 
 To handle I/O with scheduling, this can be done by considering each CPU burst required by an I/O as its own job for the scheduling policy to handle. For example task A and task B take 50ms but task A preforms 5 ms I/O operations. shortest time to completion first can be used here to schedule these tasks along with ensuring B is finished. 
+
+## Scheduling: Multi Level Feedback Queue
+MLFQ tries to optimize turnaround time which is done by running shorter jobs first. Since the OS doesn't know how short jobs will be this is hard to accomplish. 
+
+From before round robin is good to minimize response time. MLFQ wants to minimize both
+
+MLFQ has multiple queues that operate on disctinct priority levels. If more then on job is on the same queue there is a round robin scheduling that is done
+
+- rule 1: if priority(a) > priority(b): a runs
+- rule 2: if priortty(a) == priority(b) A & B run in round robin
+
+MLQF can determine priority based on the observed behavior. An example of this is a job releases the CPU often for i/o, to maximize effieciency this is high priority vs a job that simply uses the CPU for a long time. It uses the history of the job to predict the future of the job
+
+In order to allow for processing of differnt priority jobs allotment time is used which essentially is the amount of time a job can spend on any given priority level before bumping down. 
+
+Rule 3: when a job enters it starts at the highest priority
+rule 4a: If a job uses all the allotment time its prior is reduced
+rule 4b: if a job gives up the CPU for example during an IO before allotment, it stays at the same prior
+
+because of the nature of MLQF it assumes any job that arrives is a long job which is why it gives it high prior, if it isnt it loses prior
+![alt text](image-7.png)
+
+this is an example of a cpu intensive job with an i/o the i/o job is kept on high prior while it shares the cpu with the low prior
+
+The issues presented with this are multiple i/o jobs that can potentially monopolize the cpu, and an issue where a job that is cpu intensive issues a i/o at the end, again monopolizing the cpu and avoiding losing prior
+
+rule 5: after some period S, move all jobs to the topmost queue
+![alt text](image-8.png)
+with and without boosting
+As shown the cpu intensive jobs are guranteed time after the i/o jobs were controlling the cpu for awhile
+
+In order to fix gaming of the CPU from a job releasing the CPU last second and retaining its prior, changing it so the allotment time doesn't reset is the solution. In this case, even if it gives up the CPU after a certain time it will lose prior
+
+Final rules
+• Rule 1: If Priority(A) > Priority(B), A runs (B doesn’t).
+• Rule 2: If Priority(A) = Priority(B), A & B run in round-robin fash-
+ion using the time slice (quantum length) of the given queue.
+• Rule 3: When a job enters the system, it is placed at the highest
+priority (the topmost queue).
+• Rule 4: Once a job uses up its time allotment at a given level (re-
+gardless of how many times it has given up the CPU), its priority is
+reduced (i.e., it moves down one queue).
+• Rule 5: After some time period S, move all the jobs in the system
+to the topmost queue.Lottery scheduling refers to the concept of every so often execute a lottery to determine which process runs next. Processes that require more time will have more chances of winning the lottery. 
+
+
+## Lottery Scheduler
+the concept of tickets are used to represent the share of a resource that a process should receieve. The percent of tickets that a process has is related to its share of the system resource
+
+For example considering task A and task B task A has 75 tickets while task B has 25.
+
+Task A should receive 75% of the CPU time while task B should receive 25%
+
+Ticket Currency: allows a user with a set of ticketd to allocate these tickets among their jobs in whatever form of currency they want. The system converts these currency types back to a global value. 
+
+Ticket Transfer: a process hands off its tickets to another process, useful in client/server settings. If a client requests something from a server the server receives the tickets from the client to improve efficiency which are transferred back at the end. 
+
+Ticket inflation: in a system where processes trust each other a process can temporarily raise or lower its ticket count 
+
+This scheduler is implemented by using a datastructure to represent the jobs and a random number generator. Assuming a linked list implementation, each job is stored as a node and when a number is selected we iterate until the current value encountered exceeds the randomly generated number. The number that caused it to go over the number is the selected winner.
+
+
+The ordering of the list can also improve speed time slightly by ensuring as little operations of the check are ran as everything will be sorted.
+
+![alt text](image-9.png)
+![alt text](image-10.png)
+
+A fairness metric is simply the time the first job is finished divided by the time the last job finishes
+
+ex job a finishes at time 10
+job b finishes at time 20
+F = 10/20 = 0.5
+
+## Stride Scheduling
+each process is assigned a stride value, proportional to its priority
+
+the pass value is a global var
+
+when queing a job, this scheduling picks the lowest pass value to queue up. After processing it, the pass value gets incremented by the stride value 
+
+the pros to this approach are the fairness. A con is that it is bad at handling processes that arrive at the middle of the scheduling as the new process would monopolize the CPU
+
+```
+next_min = get_next_min()
+schedule(next_min)
+next_min.pass += next_min.process.stride
+```
+![alt text](image-11.png)
+
+## Linux Completely Fair Scheduler
