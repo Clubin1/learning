@@ -443,3 +443,24 @@ next_min.pass += next_min.process.stride
 ![alt text](image-11.png)
 
 ## Linux Completely Fair Scheduler
+CFS operates by each process being assigned a virtual runtime which scales proportionatly to real time passing. The scheduler picks the process with the least virtual runtime to schedule
+
+To determine when to scehdule a different task, sched_latency is used which is essentially the time a jov should run before considering a switch. This value is found by dividing 48 by the amount of jobs
+
+If there are 4 jobs running, the sched_latency by 4 which is 12 in this case so CFS executes the first job until 12 ms passes. It then checks if there is a job with a lower vruntime afterwards. 
+
+If there are too many jobs to run, min_granularity is used. Usually set to something like 6 ms
+
+CFS ensures that the job running will never be less then the value of min_granularity
+
+![alt text](nice.png)
+
+Niceness is a process priority available in unix systems in this form of scheduling the time slice is determined by the formula shown. There is a mapping done for nice score to weight which is used to determine a time slice.
+
+CFS uses a red black tree ordered by vruntime. The running jobs are stored in the tree and if a job goes to sleep or waits for i/o it is popped and stored somewhere else. 
+
+When a process goes to sleep the CFS job sets the vruntime to the min value found in the CFS tree to avoid starvation of other resources since the sleeping job would technically go to sleep add to its vruntime so the job that runs next will get starved.
+
+The issue with CFS is that I/O are likely not going to recieve their fair share of CPU runtime
+
+## Multiprocess scheduling
