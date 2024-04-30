@@ -514,3 +514,5 @@ The main idea to solve this is with **load balancing**. If a CPU is uneven with 
 A tough situation is lets say CPU 0 has 1 task and CPU 2 has 2 tasks. This would require continous migration as one CPU will always be uneven. As long as the final load is balanced that is the key part. 
 
 **work stealing** is the process of a source queue peaking at a destination queue to see if it is under more load then the source queue if it is, steal one of the jobs. The problem is that this has overhead and if we do it often we return to the original problem of not being scalable, so this is the tricky threshold problem as seen in other system problems.
+
+## Virtualization Part 1 Summary
