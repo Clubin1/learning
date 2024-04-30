@@ -464,3 +464,53 @@ When a process goes to sleep the CFS job sets the vruntime to the min value foun
 The issue with CFS is that I/O are likely not going to recieve their fair share of CPU runtime
 
 ## Multiprocess scheduling
+
+
+Caches are used to store popular data found in main memory.
+**temporal locality** refers to if an address is accessed, it is likely to be accessed again
+
+**spatial locality**  refers to the idea that if data is accessed in one spot in the memory the data around it will likely be accessed again. 
+
+In a system with multiple CPUs the issue now becomes mainly inconsistent data potentially existing in the different caches. if CPU 1 updates a value in its cache, how does CPU 2s cache know. This problem is called **cache coherence**
+
+This can be fixed with bus snooping.
+
+The cashes are connected to main memory by a bus, and when a incoming write it will update its caches or invalidate the write. 
+
+![alt text](image-12.png)
+
+An example of concurrency problems can be seen here. If the datastructure exists somewhere on memory, and two isntances of List_Pop() run they are both going to try and pop head leading to a double free error. The fix to this is to include locking in the system. Creating a mutex and locking at the start of the data change and unclocking at the end of the data change will fix this issue. This solution becomes really slow however in a multiprocessor system
+
+**cache affinity** is another problem that refers to the issue that when a process runs, it saves its state in memory somewhere for rerunning. If we ran the process in another CPU, the cpu doesn't have that state to work off, so it is always advantegous to continue running on the same cpu.
+
+### Single Queue Multiprocessor Scheduling
+Using a single queue for all incoming jobs. The issue becomes that it violates cache affinity so often runs slow. This is worsened by the overhead of locks.
+
+A solution to this is only have a few jobs move from CPU to CPU while the other jobs will try to remain in their original CPU.
+
+The main pro to this approach is that it is simple. Its main drawback is that it is not scalable.
+
+### Multi Queue Scheduling
+Multiple queues per CPU, for ex one queue per cpu. Each CPU will follow some sort of scheduler policy, ex round robin. 
+
+When jobs arrive, lets say A, B, C, D arrive at t = 0
+The scheduler splits up tasks a and b to queue in cpu 1 and c and d to queue in cpu 2
+Then the queue executes the jobs at whatever scheduling policy is used. The example below uses Round Robin. 
+
+This is good since it abides by cache affinity and lock overhead is not a huge worry as a result.
+
+![alt text](image-13.png)
+
+the issue then becomes what if the jobs are split unevenly like in this example
+
+![alt text](image-14.png)
+
+A job can finish, and ideally this works if all jobs are of the same length but that is not always the case. 
+
+This case results in A monopolozing cpu 0 and getting way more runtime then B and D. If A finishes, then CPU 0 is completly idle
+
+The main idea to solve this is with **load balancing**. If a CPU is uneven with another CPU, **migrate** one of the jobs from the CPU handling more tasks to the CPU handling less tasks.
+
+A tough situation is lets say CPU 0 has 1 task and CPU 2 has 2 tasks. This would require continous migration as one CPU will always be uneven. As long as the final load is balanced that is the key part. 
+
+**work stealing** is the process of a source queue peaking at a destination queue to see if it is under more load then the source queue if it is, steal one of the jobs. The problem is that this has overhead and if we do it often we return to the original problem of not being scalable, so this is the tricky threshold problem as seen in other system problems.
