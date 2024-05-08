@@ -16,6 +16,5 @@ std::set<int> make_sorted_random(const size_t num_elems) {
 int main() {
     auto f1 = std::async(std::launch::async, make_sorted_random, 100000);
     auto f2 = std::async(std::launch::async, make_sorted_random, 100000);
-
     std::cout << f1.get().size() << ' ' << f2.get().size() << '\n';
 }

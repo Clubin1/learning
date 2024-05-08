@@ -8,3 +8,6 @@ Design a scalable architecture for a code generation service that can handle a h
 Create a tool that automatically detects and fixes common coding errors and anti-patterns in Python code, providing suggestions for best practices and performance optimizations.
 Develop a system that learns from user interactions and adapts the code generation model to provide personalized and context-aware suggestions based on individual coding styles and preferences.
 Implement a code summarization tool that takes a Python function or module as input and generates a concise summary of its functionality, making it easier for developers to understand and navigate large codebases.
+
+https://codingchallenges.fyi/challenges/intro
+https://exercism.org/
