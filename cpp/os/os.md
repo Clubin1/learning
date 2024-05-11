@@ -534,3 +534,77 @@ The goals of the Virtual Memory system are
 - transparency: The OS should implement virtual memoery in a way that is transparent to the user program. The program behaves as if it is running in physical memory.
 - efficiency: The OS should strive to make virtualization as efficient as possible. It should also optimize memory usage as much as possible.
 - protection: The OS should aim to protect the running process from effecting other processes or even the OS (done when the process access memory outside of its address space). 
+
+## Memory API
+code stored on the stack usually refers to things like variables, functions, etc. Stack memory is sometimes called automitic memory since the compiler implcitly allocates it and deallocates it for you. 
+
+``` c++
+void func() {
+  int x; declares a variable x on the stack
+}
+```
+
+when the function goes out of scope the variable is deallocated. 
+If you want information to live after the function call you can't store it on the stack. That information has to be stored in the heap. 
+
+``` c++
+void func() {
+  int *x = (int *) malloc(sizeof(int)); // allocates memory on the heap
+}
+```
+in this code the variable x is stored on the heap, while the stack stores a pointer to the memory on the heap. 
+
+`malloc()` is a function that takes in a size and returns a pointer to the newly allocated memory if successful or `NULL` if unsuccessful.
+The only param `malloc()` takes is `size_t` which describes the size of the memory to allocate. 
+
+`free()` is a function that takes in a pointer to the memory to deallocate. 
+
+Most modern languages are garbage collected, which means the compiler knows when to deallocate memory. 
+
+Common errors usually relate to memory management. 
+
+in the code 
+
+``` C 
+char *src = "hello";
+char *dst; 
+strcpy(dst, src);
+```
+
+A segmentation fault occurs because no memory is allocated for the destination string.
+
+``` C
+char *src = "hello";
+char *dst =- (char *) malloc(strlen(src) + 1);
+strcpy(dst, src);
+```
+
+Another common error is a buffer overflow. This relates to when the destination allocated memory is not large enough to hold the source string.
+
+``` C
+char *src = "hello";
+char *dst =- (char *) malloc(strlen(src));
+strcpy(dst, src);
+```
+
+Buffer overflows can cause tons of security issues which violate our goal of keeping processes safe from each other. A program can accidently write into another processes address space and overwrite important data. 
+
+Another error is forgetting to initialize allocated memory. If memory is allocated using `malloc()` but not assigned to anything, eventually the compiler might attempt to read that address space causing an **unitialized read** where the heap reads some unknown data of an unknown value. This can potentially be harmful. 
+
+Forgetting to free memory is another big error that eventually can cause **memory leaks**. A memory leak is a situation where memory is allocated but not freed, and while it might cause gradual memory usage to increase, it will eventually cause the OS to run out of memory and crash/require a restart. 
+
+It is good habbit to free all memory that is allocated by the programmer in a program.
+
+Another issue that can arise is a **double free** error. This happens when a program tries to free memory that has already been freed. 
+
+``` C
+char *src = "hello";
+char *dst =- (char *) malloc(strlen(src));
+strcpy(dst, src);
+free(dst);
+free(dst);
+```
+
+This will cause a double free error since the memory has already been freed.
+
+It is important to call `free()` properly as not passing in a pointer that has not already been allocated can lead to malicous behavior.
