@@ -608,3 +608,24 @@ free(dst);
 This will cause a double free error since the memory has already been freed.
 
 It is important to call `free()` properly as not passing in a pointer that has not already been allocated can lead to malicous behavior.
+
+## Mechanism Address Translation
+hardware based address translation is when the hardware transforms memory addresses to a physical address. Everytime a memory address is referenced the hardware will translate the address to a physical address.
+
+when a program is ran, it creates bounds in the address space on where the program can access. The OS will usually start at 0 kb not the running process, but when the process runs it creates a bound and a physical address space can be created by getting the virtual address and adding the base address of the process.
+
+![alt text](image.png)
+
+this process is called relocation.
+
+After a process has finished address translation if the physical address is out of bounds set by the process, the OS will return an error.
+
+![alt text](image-1.png)
+
+List of requirements the hardware must meed to allow for address translation. 
+
+The software uses something called a `free list` to keep track of the free memory. The state of the list is tried to what slotes of memory are currently free or being used. When a process occupies a slot of memory it is removed from the free list. When the os frees the memory it adds it to the free list.
+
+During context switches the software saves the base bound registers in some per process data structure. When that same process runs again, it restores the base bound registers. 
+
+![alt text](image-2.png)
